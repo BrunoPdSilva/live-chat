@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, onSnapshot, query, where, orderBy } from "firebase/firestore"
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp, onSnapshot, query, where, orderBy, Timestamp } from "firebase/firestore"
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6VhNgXTQ6tbalrnDjvy0JxYLVAGbmLHQ",
@@ -23,7 +23,7 @@ class Chatroom {
     this.unsub
   }
   addChat(message) {
-    const chat = { message, username: this.username, room: this.room, created_at: serverTimestamp() }
+    const chat = { message, username: this.username, room: this.room, created_at: Timestamp.fromDate(new Date()) }
     addDoc(this.chats, chat)
       .then(() => console.log('chat adicionado'))
       .catch(err => console.log(err.message))
@@ -32,7 +32,6 @@ class Chatroom {
     this.unsub = onSnapshot(this.query, (snapshot) => {
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added') {
-          // update the ui
           callback(change.doc.data())
         }
       })
@@ -59,7 +58,7 @@ class ChatUI {
     const when = dateFns.distanceInWordsToNow(
       data.created_at.toDate(),
       { addSuffix: true }
-    )
+    ) 
     const html = `
     <li class="list-group-item">
       <span class="username">${data.username}</span>
